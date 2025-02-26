@@ -1,0 +1,95 @@
+version: "3.1"
+
+slots:
+  recipient:
+    type: text
+    mappings:
+      - type: from_llm
+  amount:
+    type: float
+    mappings:
+      - type: from_llm
+  bookingId:
+    type: text
+    mappings:
+      - type: from_llm
+  modulename:
+    type: text
+    mappings:
+      - type: from_llm
+  has_sufficient_funds:
+    type: text
+    mappings:
+      - type: from_llm
+  booking_details_error:
+    type: text
+    mappings:
+      - type: from_llm
+  overall_booking_details:
+    type: text
+    mappings:
+      - type: from_llm
+  title:
+    type: text
+    mappings:
+      - type: from_llm
+  travelDate:
+    type: text
+    mappings:
+      - type: from_llm
+  sellChannel:
+    type: text
+    mappings:
+      - type: from_llm  
+  enquiry_details_error:
+    type: text
+    mappings:
+      - type: from_llm
+responses:
+  utter_ask_recipient:
+    - text: "Who would you like to send money to?"
+  utter_insufficient_funds:
+    - text: "Do not have suffiecient fund to transfer"
+  utter_ask_amount:
+    - text: "How much money would you like to send?"
+  utter_transfer_complete:
+    - text: "All done. {amount} has been sent to {recipient}."
+  utter_error_in_fetching_bookin_details:
+    - text: "Error in fetching booking details"
+  utter_error_in_fetching_enquiry_details:
+    - text: "Error in fetching enquiry details"
+  utter_booking_detail_obtained:
+    - text: "Booking details obtained"
+  utter_end_flow:
+    - text: "Hope this information meets your requirements! Is there anything else I can assist you with?"
+  utter_ask_bookingId:
+    - text: "Enter bookingId for which you would like to get information about"
+  utter_ask_modulename:
+    - text: "Enter the module name (i.e. cutomer, passengers or agent)"
+  utter_ask_title:
+    - text: "Enter the title for your enquiry"
+  utter_ask_travelDate:
+    - text: "Enter the travel date (in format yyyy-mm-dd)"
+  utter_ask_sellChannel:
+    - text: "Enter the sell channel code like AAS, MDXB, ONC or MLON"
+  utter_over_all_booking_details:
+    - text: "Overall booking details are {overall_booking_details}"
+  utter_free_chitchat_response:
+    - text: "placeholder"
+      metadata:
+        rephrase: True
+        rephrase_prompt: |
+          The following is a conversation with an AI assistant built with Rasa.
+          The assistant can help the user transfer money.
+          The assistant is helpful, creative, clever, and very friendly.
+          The user is making small talk, and the assistant should respond, keeping things light.
+          Context / previous conversation with the user:
+          {{history}}
+          {{current_input}}
+          Suggested AI Response:
+actions:
+  - action_check_sufficient_funds
+  - utter_booking_detail_obtained
+  - action_get_booking_detail
+  - action_restart
+  - action_create_new_enquiry

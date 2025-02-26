@@ -1,0 +1,86 @@
+flows:  
+  transfer_money:
+    description: This flow lets users send money to friends and family.
+    persisted_slots:
+      - recipient
+      - amount
+    steps:
+      - collect: recipient
+      - id: ask_amount
+        collect: amount
+        description: the number of US dollars to send
+      - action: action_check_sufficient_funds
+        next:
+          - if: not slots.has_sufficient_funds
+            then:
+              - action: utter_insufficient_funds
+              - set_slots:
+                  - amount: null
+                next: ask_amount
+          - else: final_confirmation
+      - id: final_confirmation # slot name
+        action: utter_transfer_complete
+        
+  create_enquiry:
+    description: "Help user to create enquiry on request"
+    persisted_slots:
+      - title
+      - travelDate
+      - sellChannel
+    steps:
+      - id: enquiry_details
+        collect: title
+      - collect: travelDate
+        description: "ask user to enter the data in yyyy-mm-dd format"
+      - collect: sellChannel
+        description: "ask user to enter sell channel codes like AAS, MDXB, ONC, MLON"
+      - action: action_create_new_enquiry
+        next:
+          - if: slots.enquiry_details_error  # Assuming there's a way to check if an error was set
+            then:
+              - action: utter_error_in_fetching_enquiry_details
+              - set_slots:
+                  - title: null  
+                  - travelDate: null
+                  - sellChannel: null
+                next: enquiry_details
+          - else: final_enquiry_confirmation
+      - id: final_enquiry_confirmation # slot name
+        action: utter_end_flow
+        next: restart_flow
+      - id: restart_flow     
+        action: action_restart
+
+  
+  restart_flow:
+    description: "If user want to restart or exit the current flow"
+    steps:
+      - action: action_restart
+    
+
+          
+  booking_details:
+    description: "Help users to get the booking related details."
+    persisted_slots:
+      - bookingId
+      - modulename
+    steps:
+      - id: booking_details
+        collect: bookingId
+      - collect: modulename
+        description: "the modulename would be like customer, passengers, and agent"
+      - action: action_get_booking_detail
+        next:
+          - if: slots.booking_details_error  # Assuming there's a way to check if an error was set
+            then:
+              - action: utter_error_in_fetching_bookin_details
+              - set_slots:
+                  - bookingId: null  # Reset the error slot after handling
+                  - modulename: null
+                next: booking_details
+          - else: final_booking_confirmation
+      - id: final_booking_confirmation # slot name
+        action: utter_end_flow
+        next: restart_flow
+      - id: restart_flow     
+        action: action_restart
